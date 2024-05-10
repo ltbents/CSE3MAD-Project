@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="100dp"
+    android:background="@color/black"
+    tools:context=".welcomePage"
+    >
+
+    <TextView
+        android:id="@+id/textTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/UpToList"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        />
+
+    <Button
+
+        android:id="@+id/btnwelLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="350dp"
+        android:background="@color/red"
+        android:text="@string/login"
+        android:textColor="@color/white"
+        tools:ignore="VisualLintButtonSize" />
+
+    <Button
+        android:id="@+id/btnWelCreateAccount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:background="@color/red"
+        android:text="@string/create_account"
+        android:textColor="#FFFFFF"
+        tools:ignore="VisualLintButtonSize" />
+
+</LinearLayout>
+

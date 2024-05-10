@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Project 3</string>
+    <string name="create_account_button">create account button</string>
+    <string name="login">Login</string>
+    <string name="create_account">Create Account</string>
+    <string name="UpToList">UpToList</string>
+    <string name="email">Email\n</string>
+    <string name="password">Password\n</string>
+    <string name="register">Register</string>
 </resources>
