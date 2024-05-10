@@ -27,7 +27,17 @@
         android:background="@drawable/uptolist_border" />
 
     <!-- LOGIN button -->
-
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textTitle"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/login_button"
+        android:text="LOGIN"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="32dp" />
     <!-- CREATE ACCOUNT button -->
 
     <Button
