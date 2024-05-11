@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="100dp"
-    android:background="@color/black"
+    android:background="@color/white"
     tools:context=".welcomePage"
     >
 
@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/UpToList"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/black"
         android:textSize="28sp"
         android:textStyle="bold"
         />
@@ -29,7 +29,7 @@
         android:layout_marginTop="350dp"
         android:background="@color/red"
         android:text="@string/login"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         tools:ignore="VisualLintButtonSize" />
 
     <Button
@@ -39,7 +39,7 @@
         android:layout_marginTop="40dp"
         android:background="@color/red"
         android:text="@string/create_account"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/black"
         tools:ignore="VisualLintButtonSize" />
 
 </LinearLayout>

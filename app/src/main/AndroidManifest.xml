@@ -24,10 +24,12 @@
         </activity>
         <activity
             android:name=".Register"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".welcomePage"/>
         <activity
             android:name=".Login"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".welcomePage"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
