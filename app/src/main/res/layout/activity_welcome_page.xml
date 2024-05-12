@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="350dp"
-        android:background="@color/red"
+        android:background="@drawable/custom_button_2"
         android:text="@string/login"
         android:textColor="@color/black"
         tools:ignore="VisualLintButtonSize" />
@@ -37,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:background="@color/red"
+        android:background="@drawable/custom_button"
         android:text="@string/create_account"
         android:textColor="@color/black"
         tools:ignore="VisualLintButtonSize" />

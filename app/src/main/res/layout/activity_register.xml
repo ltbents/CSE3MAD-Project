@@ -10,6 +10,15 @@
     android:background="@color/white"
     android:padding="15dp"
     tools:context=".Register">
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:layout_marginBottom="70dp"
+        android:clickable="true"
+        android:backgroundTint="@color/red"
+        app:srcCompat="@drawable/baseline_arrow_back_24"/>
 
     <TextView
         android:text="@string/register"
@@ -65,7 +74,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/register"
-        android:background="@color/red"
+        android:background="@drawable/custom_button_2"
         />
     <TextView
         android:textStyle="bold"
@@ -74,6 +83,7 @@
         android:layout_marginTop="20dp"
         android:id="@+id/loginNow"
         android:text="@string/login"
+        android:textColor="@color/black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

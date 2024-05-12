@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,19 +33,29 @@ public class Login extends AppCompatActivity {
     FirebaseAuth mAuth;
     ProgressBar progressBar;
     TextView textView;
+    FloatingActionButton btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
-        //Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         mAuth = FirebaseAuth.getInstance();
+        btnBack = findViewById(R.id.btnBack);
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
         btnLog = findViewById(R.id.btnLogLogin);
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.registerNow);
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), welcomePage.class);
+                startActivity(intent);
+                finish();
+            }
+        });
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,5 +110,4 @@ public class Login extends AppCompatActivity {
             }
         });
     }
-
 }

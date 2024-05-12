@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +33,7 @@ public class Register extends AppCompatActivity {
     FirebaseAuth mAuth;
     ProgressBar progressBar;
     TextView textView;
+    FloatingActionButton btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,16 @@ public class Register extends AppCompatActivity {
         btnReg = findViewById(R.id.btnRegRegister);
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.loginNow);
+        btnBack = findViewById(R.id.btnBack);
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent( Register.this, welcomePage.class);
+                startActivity(intent);
+                finish();
+            }
+        });
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

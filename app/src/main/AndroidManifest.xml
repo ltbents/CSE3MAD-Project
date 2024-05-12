@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Project3"
+
         tools:targetApi="31">
         <activity
             android:name=".welcomePage"
@@ -24,11 +25,9 @@
         </activity>
         <activity
             android:name=".Register"
-            android:exported="false"
             android:parentActivityName=".welcomePage"/>
         <activity
             android:name=".Login"
-            android:exported="false"
             android:parentActivityName=".welcomePage"/>
         <activity
             android:name=".MainActivity"
