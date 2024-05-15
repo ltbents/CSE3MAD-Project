@@ -11,6 +11,7 @@
         android:layout_height="match_parent"
         android:elevation="8dp"
         app:cardCornerRadius="8dp"
+        android:backgroundTint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent">
@@ -27,6 +28,7 @@
                 android:buttonTint="@color/black"
                 android:paddingStart="10dp"
                 android:text="This is task 1"
+                android:textColor="@color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"

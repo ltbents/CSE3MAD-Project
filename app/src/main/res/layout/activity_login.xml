@@ -77,7 +77,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:background="@color/red"
+        android:background="@drawable/custom_button_2"
         android:text="@string/login" />
 
     <TextView
