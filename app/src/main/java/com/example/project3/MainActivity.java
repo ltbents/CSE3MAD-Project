@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.project3.Adapter.ToDoAdapter;
 import com.example.project3.Model.ToDoModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -33,6 +35,9 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
     private ToDoAdapter adapter;
     private List<ToDoModel> mList;
     private Query query;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
+    private String userID;
     private ListenerRegistration listenerRegistration;
 
     @Override
@@ -44,6 +49,12 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
         recyclerView = findViewById(R.id.reView);
         floatingActionButton = findViewById(R.id.floatBtnAct);
         firestore = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+
+        if (mUser != null){
+            userID = mUser.getUid();
+        }
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
@@ -64,7 +75,7 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
     }
 
     private void showData() {
-        query = firestore.collection("task").orderBy("time", Query.Direction.DESCENDING);
+        query = firestore.collection("users").document(userID).collection("task").orderBy("time", Query.Direction.DESCENDING);
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>(){
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
