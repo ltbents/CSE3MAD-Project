@@ -1,6 +1,10 @@
 package com.example.project3;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -91,7 +95,23 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
         showData();
         adapter.notifyDataSetChanged();
     }
+    @Override
+    public void onTaskClick(ToDoModel task) {
+        scheduleNotification(task);
+    }
 
+    private void scheduleNotification(ToDoModel task) {
+        long reminderTimeMillis = task.getDueDate().getTime(); // Adjust as needed
+
+        Intent notificationIntent = new Intent(this, NotificationReceiver.class);
+        notificationIntent.putExtra("task_title", task.getTitle());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent);
+        }
+    }
 //    @Override
 //    public void onDialogClose(DialogInterface dialogInterface) {
 //        mList.clear();
