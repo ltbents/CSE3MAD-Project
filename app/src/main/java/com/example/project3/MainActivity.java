@@ -1,6 +1,9 @@
 package com.example.project3;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -71,6 +74,7 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TouchHelper(adapter));
         itemTouchHelper.attachToRecyclerView(recyclerView);
         showData();
+        createNotificationChannel();
         recyclerView.setAdapter(adapter);
     }
 
@@ -94,6 +98,18 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
                 listenerRegistration.remove();
             }
         });
+    }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "ReminderChannel";
+            String description = "Channel for Task Reminders";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("channel_id", name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     @Override

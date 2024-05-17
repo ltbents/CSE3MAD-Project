@@ -5,6 +5,16 @@ public class ToDoModel extends TaskId {
     private String due;
     private int status;
 
+    private String reminder;
+
+    public String getReminder() {
+        return reminder;
+    }
+
+    public void setReminder(String reminder) {
+        this.reminder = reminder;
+    }
+
     public String getTask() {
         return task;
     }

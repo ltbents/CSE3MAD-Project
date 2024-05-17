@@ -53,6 +53,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
         Bundle bundle = new Bundle();
         bundle.putString("task" , toDoModel.getTask());
         bundle.putString("due" , toDoModel.getDue());
+        bundle.putString("reminder",toDoModel.getReminder());
         bundle.putString("id" , toDoModel.TaskId);
 
         addNewTask AddnewTask = new addNewTask();
@@ -64,10 +65,18 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
         ToDoModel toDoModel = todoList.get(position);
         holder.mCheckBox.setText(toDoModel.getTask());
         String dueDate = toDoModel.getDue();
+        String reminder =toDoModel.getReminder();
         if (dueDate != null) {
             holder.mDueDateTv.setText(holder.itemView.getContext().getString(R.string.due_date_text, dueDate));
-        } else {
+        }
+        else {
             holder.mDueDateTv.setText(holder.itemView.getContext().getString(R.string.due_date_not_set));
+        }
+        if(reminder != null){
+            holder.mReminder.setText(holder.itemView.getContext().getString(R.string.set_time, reminder));
+        }
+        else {
+            holder.mReminder.setText(holder.itemView.getContext().getString(R.string.not_set_time));
         }
         holder.mCheckBox.setChecked(toBoolean(toDoModel.getStatus()));
 
@@ -104,12 +113,14 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView mDueDateTv;
+        TextView mReminder;
         CheckBox mCheckBox;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             mDueDateTv = itemView.findViewById(R.id.dueDate);
             mCheckBox = itemView.findViewById(R.id.checkBox);
+            mReminder = itemView.findViewById(R.id.reminder);
         }
     }
 }
