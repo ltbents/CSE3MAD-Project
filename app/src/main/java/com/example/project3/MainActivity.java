@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
                             adapter.notifyDataSetChanged();
                         }
                     }
+                    listenerRegistration.remove();
                 } else {
                     Log.e("MainActivity", "QuerySnapshot is null");
                 }
