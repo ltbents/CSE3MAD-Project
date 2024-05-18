@@ -1,6 +1,9 @@
 package com.example.project3;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -14,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.project3.Adapter.ToDoAdapter;
 import com.example.project3.Model.ToDoModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -33,6 +38,9 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
     private ToDoAdapter adapter;
     private List<ToDoModel> mList;
     private Query query;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
+    private String userID;
     private ListenerRegistration listenerRegistration;
 
     @Override
@@ -44,6 +52,12 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
         recyclerView = findViewById(R.id.reView);
         floatingActionButton = findViewById(R.id.floatBtnAct);
         firestore = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+
+        if (mUser != null){
+            userID = mUser.getUid();
+        }
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
@@ -60,11 +74,12 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TouchHelper(adapter));
         itemTouchHelper.attachToRecyclerView(recyclerView);
         showData();
+        createNotificationChannel();
         recyclerView.setAdapter(adapter);
     }
 
     private void showData() {
-        query = firestore.collection("task").orderBy("time", Query.Direction.DESCENDING);
+        query = firestore.collection("users").document(userID).collection("task").orderBy("time", Query.Direction.DESCENDING);
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>(){
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -83,6 +98,18 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
                 listenerRegistration.remove();
             }
         });
+    }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "ReminderChannel";
+            String description = "Channel for Task Reminders";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("channel_id", name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     @Override

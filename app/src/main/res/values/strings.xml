@@ -9,4 +9,6 @@
     <string name="register">Register</string>
     <string name="due_date_text">Due On %1$s</string>
     <string name="due_date_not_set">Due Date Not Set</string>
+    <string name="set_time">Set Time %1$s</string>
+    <string name="not_set_time">Time Not Set</string>
 </resources>
