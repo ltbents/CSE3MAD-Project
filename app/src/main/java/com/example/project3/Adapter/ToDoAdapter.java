@@ -55,7 +55,6 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
         bundle.putString("due" , toDoModel.getDue());
         bundle.putString("reminder",toDoModel.getReminder());
         bundle.putString("id" , toDoModel.TaskId);
-
         addNewTask AddnewTask = new addNewTask();
         AddnewTask.setArguments(bundle);
         AddnewTask.show(activity.getSupportFragmentManager(), AddnewTask.getTag());

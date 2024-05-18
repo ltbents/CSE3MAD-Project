@@ -3,9 +3,12 @@ package com.example.project3;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
@@ -34,6 +37,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity  implements OnDialogCloseListener{
     private RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
+    private Button btnLogOut;
     private FirebaseFirestore firestore;
     private ToDoAdapter adapter;
     private List<ToDoModel> mList;
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
 
         recyclerView = findViewById(R.id.reView);
         floatingActionButton = findViewById(R.id.floatBtnAct);
+        btnLogOut = findViewById(R.id.btnLogOut);
         firestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -58,9 +63,23 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
         if (mUser != null){
             userID = mUser.getUid();
         }
+        else{
+            Log.e("MainActivity","User not authenticated");
+            return;
+        }
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+
+        btnLogOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getApplicationContext(), Login.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,26 +98,36 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
     }
 
     private void showData() {
+        if (userID == null) {
+            Log.e("MainActivity", "User ID is null");
+            return;
+        }
+
         query = firestore.collection("users").document(userID).collection("task").orderBy("time", Query.Direction.DESCENDING);
-        listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>(){
+        listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
+                    Log.e("MainActivity", "Listen failed: ", error);
                     return;
                 }
 
-                for (DocumentChange documentChange : value.getDocumentChanges()) {
-                    if (documentChange.getType() == DocumentChange.Type.ADDED) {
-                        String id = documentChange.getDocument().getId();
-                        ToDoModel toDoModel = documentChange.getDocument().toObject(ToDoModel.class).withId(id);
-                        mList.add(toDoModel);
-                        adapter.notifyDataSetChanged();
+                if (value != null) {
+                    for (DocumentChange documentChange : value.getDocumentChanges()) {
+                        if (documentChange.getType() == DocumentChange.Type.ADDED) {
+                            String id = documentChange.getDocument().getId();
+                            ToDoModel toDoModel = documentChange.getDocument().toObject(ToDoModel.class).withId(id);
+                            mList.add(toDoModel);
+                            adapter.notifyDataSetChanged();
+                        }
                     }
+                } else {
+                    Log.e("MainActivity", "QuerySnapshot is null");
                 }
-                listenerRegistration.remove();
             }
         });
     }
+
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "ReminderChannel";
@@ -118,11 +147,4 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
         showData();
         adapter.notifyDataSetChanged();
     }
-
-//    @Override
-//    public void onDialogClose(DialogInterface dialogInterface) {
-//        mList.clear();
-//        showData();
-//        adapter.notifyDataSetChanged();
-//    } bug currently working on it
 }

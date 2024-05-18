@@ -9,9 +9,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +51,7 @@ public class addNewTask extends BottomSheetDialogFragment {
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
-    private String userID;
+    private String userID = "";
     private Context context;
     private String dueDate = "";
     private String id = "";
@@ -147,13 +149,14 @@ public class addNewTask extends BottomSheetDialogFragment {
                 Calendar calendar = Calendar.getInstance();
                 int hour = calendar.get(Calendar.HOUR_OF_DAY);
                 int minute = calendar.get(Calendar.MINUTE);
+
                 TimePickerDialog timePickerDialog = new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
                     @Override
-                    public void onTimeSet(TimePicker timePicker, int selected_hour, int selected_minute) {
-                        reminderTime = selected_hour + ":" + selected_minute;
+                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                        reminderTime = selectedHour + ":" + String.format("%02d", selectedMinute); // Ensure minute is always two digits
                         setReminder.setText(reminderTime);
                     }
-                },hour, minute, true);
+                }, hour, minute, true);
                 timePickerDialog.show();
             }
         });
@@ -163,31 +166,52 @@ public class addNewTask extends BottomSheetDialogFragment {
             public void onClick(View view) {
                 String taskDescription = desTask.getText().toString();
 
-//                if(finalIsUpdate){
-//                    firestore.collection("task").document(id).update("task", taskDescription , "due", dueDate);
-//                    Toast.makeText(context, "Task Updated", Toast.LENGTH_SHORT).show();
-//                }
+                if (finalIsUpdate) {
+                    Map<String, Object> updatedTaskMap = new HashMap<>();
+                    updatedTaskMap.put("task", taskDescription);
+                    updatedTaskMap.put("due", dueDate);
+                    updatedTaskMap.put("reminder", reminderTime);
 
-                    if (taskDescription.isEmpty() || dueDate.isEmpty() || reminderTime.isEmpty()) {
-                        Toast.makeText(context, "Fill the blank", Toast.LENGTH_SHORT).show();
-                        return;
+                    if (userID != null) {
+                        firestore.collection("users").document(userID).collection("task").document(id).update(updatedTaskMap)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(context, "Task Updated", Toast.LENGTH_SHORT).show();
+                                            scheduleReminder(id, updatedTaskMap);
+                                        } else {
+                                            Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                     }
-                    else {
 
-                        Map<String, Object> taskMap = new HashMap<>();
-                        taskMap.put("task", taskDescription);
-                        taskMap.put("due", dueDate);
-                        taskMap.put("status", 0);
-                        taskMap.put("reminder",reminderTime);
-                        taskMap.put("time", FieldValue.serverTimestamp());
-                        if(userID != null){
+                } else{
+                    if (taskDescription.isEmpty() || dueDate.isEmpty() || reminderTime.isEmpty()) {
+                    Toast.makeText(context, "Fill the blank", Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+
+                    Map<String, Object> taskMap = new HashMap<>();
+                    taskMap.put("task", taskDescription);
+                    taskMap.put("due", dueDate);
+                    taskMap.put("status", 0);
+                    taskMap.put("reminder", reminderTime);
+                    taskMap.put("time", FieldValue.serverTimestamp());
+                    if (userID != null) {
                         firestore.collection("users").document(userID).collection("task").add(taskMap).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentReference> task) {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(context, "Task Saved", Toast.LENGTH_SHORT).show();
-                                    String taskId =task.getResult().getId();
-                                    scheduleReminder(taskId,taskMap);
+                                    String taskId = task.getResult().getId();
+                                    scheduleReminder(taskId, taskMap);
                                 } else {
                                     Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
@@ -200,30 +224,75 @@ public class addNewTask extends BottomSheetDialogFragment {
                         });
                     }
                 }
+            }
                 dismiss();
             }
         });
     }
     private void scheduleReminder(String taskId, Map<String, Object> taskMap) {
+        // Ensure context is not null
+        if (context == null) {
+            throw new IllegalStateException("Context cannot be null");
+        }
+
+        // Check if reminderTime is valid
+        if (reminderTime == null || reminderTime.isEmpty()) {
+            Log.e("scheduleReminder", "Reminder time is not set");
+            return;
+        }
+
+        // Get AlarmManager instance
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager == null) {
+            throw new IllegalStateException("AlarmManager is not available");
+        }
+
+        // Create an Intent for the ReminderBroadcastReceiver
         Intent intent = new Intent(context, ReminderBroadcastReceiver.class);
         intent.putExtra("taskId", taskId);
         intent.putExtra("taskDescription", taskMap.get("task").toString());
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, taskId.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        String[] timeParts = reminderTime.split(":");
-        int hour = Integer.parseInt(timeParts[0]);
-        int minute = Integer.parseInt(timeParts[1]);
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
-        if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        // Define PendingIntent flags
+        int pendingIntentFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            pendingIntentFlags |= PendingIntent.FLAG_IMMUTABLE;
         }
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+
+        try {
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, taskId.hashCode(), intent, pendingIntentFlags);
+
+            // Parse the reminder time
+            String[] timeParts = reminderTime.split(":");
+            if (timeParts.length != 2) {
+                Log.e("scheduleReminder", "Invalid reminder time format: " + reminderTime);
+                return;
+            }
+
+            int hour = Integer.parseInt(timeParts[0]);
+            int minute = Integer.parseInt(timeParts[1]);
+
+            // Set the reminder time
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
+            calendar.set(Calendar.MINUTE, minute);
+            calendar.set(Calendar.SECOND, 0);
+
+            // Adjust for past time
+            if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+            }
+
+            // Set the alarm
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            Log.d("scheduleReminder", "Alarm set for taskId: " + taskId);
+        } catch (NumberFormatException e) {
+            Log.e("scheduleReminder", "Error parsing reminder time: " + e.getMessage(), e);
+        } catch (Exception e) {
+            Log.e("scheduleReminder", "Error setting alarm: " + e.getMessage(), e);
+        }
     }
+
+
 
     @Override
     public void onAttach(@NonNull Context context) {
