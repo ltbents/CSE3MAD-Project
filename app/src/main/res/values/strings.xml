@@ -15,4 +15,6 @@
     <string name="change_Password">Change Password</string>
     <string name="Change_password">Change Password</string>
     <string name="log_out">Log Out</string>
+    <string name="new_password">New Password</string>
+    <string name="save">Save</string>
 </resources>
