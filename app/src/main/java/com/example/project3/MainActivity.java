@@ -37,6 +37,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity  implements OnDialogCloseListener{
     private RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
+    private Button btnProfile;
     private FirebaseFirestore firestore;
     private ToDoAdapter adapter;
     private List<ToDoModel> mList;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
         firestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-
+        btnProfile = findViewById(R.id.btnProfile);
         if (mUser != null){
             userID = mUser.getUid();
         }
@@ -76,6 +77,15 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
                 addNewTask.newInstance().show(getSupportFragmentManager(), addNewTask.TAG);
             }
         });
+
+        btnProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(),userProfile.class);
+                startActivity(intent);
+            }
+        });
+
 
         mList = new ArrayList<>();
         adapter = new ToDoAdapter(MainActivity.this, mList);

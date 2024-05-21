@@ -2,11 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-<uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
 
     <application
         android:allowBackup="true"
@@ -17,8 +16,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Project3"
-
         tools:targetApi="31">
+        <activity
+            android:name=".userProfile"
+            android:exported="false" />
         <activity
             android:name=".welcomePage"
             android:exported="true">
@@ -30,14 +31,17 @@
         </activity>
         <activity
             android:name=".Register"
-            android:parentActivityName=".welcomePage"/>
+            android:parentActivityName=".welcomePage" />
         <activity
             android:name=".Login"
-            android:parentActivityName=".welcomePage"/>
+            android:parentActivityName=".welcomePage" />
         <activity
             android:name=".MainActivity"
-            android:exported="true"/>
-        <receiver android:name=".ReminderBroadcastReceiver" android:exported="false"/>
+            android:exported="true" />
+
+        <receiver
+            android:name=".ReminderBroadcastReceiver"
+            android:exported="false" />
     </application>
 
 </manifest>
