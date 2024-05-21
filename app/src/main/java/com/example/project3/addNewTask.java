@@ -44,14 +44,17 @@ import java.util.Map;
 
 public class addNewTask extends BottomSheetDialogFragment {
     public static final String TAG = "addNewTask";
+    // UI elements
     private TextView setDueDate;
     private TextView setReminder;
     private EditText desTask;
     private Button btnSave;
+    // Firebase instances
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private String userID = "";
+    // Context and task fields
     private Context context;
     private String dueDate = "";
     private String id = "";
@@ -61,26 +64,28 @@ public class addNewTask extends BottomSheetDialogFragment {
 
     public static addNewTask newInstance() {
         return new addNewTask();
-    }
+    }// Factory method to create a new instance of the fragment
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Inflate the layout for the fragment
         return inflater.inflate(R.layout.add_new_task, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        // Set up the view and initialize components
+        super.onViewCreated(view, savedInstanceState); // Initialize UI elements
         setDueDate = view.findViewById(R.id.tv_set_due);
         setReminder = view.findViewById(R.id.tv_reminder);
         desTask = view.findViewById(R.id.task_edittext);
         btnSave = view.findViewById(R.id.btnSave);
-        firestore = FirebaseFirestore.getInstance();
+        firestore = FirebaseFirestore.getInstance();// Initialize Firebase instances
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
-        if (mUser != null){
+        if (mUser != null){// Get the user ID if the user is logged in
             userID = mUser.getUid();
         }
         boolean isUpdate = false;
@@ -100,7 +105,7 @@ public class addNewTask extends BottomSheetDialogFragment {
             }
         }
 
-        desTask.addTextChangedListener(new TextWatcher() {
+        desTask.addTextChangedListener(new TextWatcher() {// Add text change listener to task description
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
@@ -121,7 +126,7 @@ public class addNewTask extends BottomSheetDialogFragment {
             }
         });
         boolean finalIsUpdate = isUpdate;
-        setDueDate.setOnClickListener(new View.OnClickListener() {
+        setDueDate.setOnClickListener(new View.OnClickListener() {// Set due date click listener
             @Override
             public void onClick(View view) {
                 Calendar calendar = Calendar.getInstance();
@@ -143,7 +148,7 @@ public class addNewTask extends BottomSheetDialogFragment {
             }
         });
 
-        setReminder.setOnClickListener(new View.OnClickListener() {
+        setReminder.setOnClickListener(new View.OnClickListener() {// Set reminder time click listener
             @Override
             public void onClick(View view) {
                 Calendar calendar = Calendar.getInstance();
@@ -161,12 +166,12 @@ public class addNewTask extends BottomSheetDialogFragment {
             }
         });
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
+        btnSave.setOnClickListener(new View.OnClickListener() {// Save button click listener
             @Override
             public void onClick(View view) {
                 String taskDescription = desTask.getText().toString();
 
-                if (finalIsUpdate) {
+                if (finalIsUpdate) { // Update task if it's an update operation
                     Map<String, Object> updatedTaskMap = new HashMap<>();
                     updatedTaskMap.put("task", taskDescription);
                     updatedTaskMap.put("due", dueDate);
@@ -192,7 +197,7 @@ public class addNewTask extends BottomSheetDialogFragment {
                                 });
                     }
 
-                } else{
+                } else{// Add new task
                     if (taskDescription.isEmpty() || dueDate.isEmpty() || reminderTime.isEmpty()) {
                     Toast.makeText(context, "Fill the blank", Toast.LENGTH_SHORT).show();
                     return;
@@ -225,11 +230,11 @@ public class addNewTask extends BottomSheetDialogFragment {
                     }
                 }
             }
-                dismiss();
+                dismiss();// Close the dialog
             }
         });
     }
-    private void scheduleReminder(String taskId, Map<String, Object> taskMap) {
+    private void scheduleReminder(String taskId, Map<String, Object> taskMap) {// Method to schedule a reminder using AlarmManager
         // Ensure context is not null
         if (context == null) {
             throw new IllegalStateException("Context cannot be null");
@@ -295,13 +300,13 @@ public class addNewTask extends BottomSheetDialogFragment {
 
 
     @Override
-    public void onAttach(@NonNull Context context) {
+    public void onAttach(@NonNull Context context) {// Attach context to the fragment
         super.onAttach(context);
         this.context = context;
     }
 
     @Override
-    public void onDismiss(@NonNull DialogInterface dialog) {
+    public void onDismiss(@NonNull DialogInterface dialog) {// Handle dialog dismissal and notify activity if it implements OnDialogCloseListener
         super.onDismiss(dialog);
         Activity activity = getActivity();
         if (activity instanceof OnDialogCloseListener) {

@@ -22,23 +22,26 @@ public class userProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_user_profile);
+        // Initialize views and Firebase authentication instance
         btnchangepassword = findViewById(R.id.btnChangePassword);
         btnLogout = findViewById(R.id.btnLogout);
         mauth = FirebaseAuth.getInstance();
 
         btnLogout.setOnClickListener(new View.OnClickListener() {
+            // Button click listener for logout
             @Override
             public void onClick(View view) {
-                mauth.signOut();
-                Intent intent = new Intent(userProfile.this, Login.class);
+                mauth.signOut();// Sign out the current user
+                Intent intent = new Intent(userProfile.this, Login.class);// Redirect to the login activity
                 startActivity(intent);
                 finish();
             }
         });
         btnchangepassword.setOnClickListener(new View.OnClickListener() {
+            // Button click listener for changing password
             @Override
             public void onClick(View view) {
-                change_password.newInstance().show(getSupportFragmentManager(), change_password.TAG);
+                change_password.newInstance().show(getSupportFragmentManager(), change_password.TAG);// Show the change password dialog
             }
         });
     }

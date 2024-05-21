@@ -20,21 +20,25 @@ public class welcomePage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_welcome_page);
+        // Initialize buttons
        btnWelLog = findViewById(R.id.btnwelLogin);
        btnWelLog.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view) {
+               // Button click listener for login
                Intent intent = new Intent(getApplicationContext(),Login.class);
-               startActivity(intent);
+               startActivity(intent);// Start the login activity
                finish();
            }
        });
+        // Initialize buttons
        btnWelReg = findViewById(R.id.btnWelCreateAccount);
        btnWelReg.setOnClickListener(new View.OnClickListener() {
+           // Button click listener for creating an account
            @Override
            public void onClick(View view) {
                Intent intent = new Intent(getApplicationContext(), Register.class);
-               startActivity(intent);
+               startActivity(intent);// Start the register activity
                finish();
            }
        });
