@@ -18,7 +18,7 @@
         />
 
     <Button
-        android:id="@+id/useractingbtn"
+        android:id="@+id/btnProfile"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginEnd="10dp"

@@ -3,9 +3,11 @@ package com.example.project3;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
@@ -34,7 +36,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity  implements OnDialogCloseListener{
     private RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
-    private FloatingActionButton floatingUserButton;
+    private Button btnProfile;
     private FirebaseFirestore firestore;
     private ToDoAdapter adapter;
     private List<ToDoModel> mList;
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
         firestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-
+        btnProfile = findViewById(R.id.btnProfile);
         if (mUser != null){
             userID = mUser.getUid();
         }
@@ -67,6 +69,14 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
             @Override
             public void onClick(View view) {
                 addNewTask.newInstance().show(getSupportFragmentManager(), addNewTask.TAG);
+            }
+        });
+
+        btnProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(),userProfile.class);
+                startActivity(intent);
             }
         });
 
