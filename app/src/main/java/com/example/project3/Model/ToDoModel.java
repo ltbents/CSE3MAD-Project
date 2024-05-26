@@ -6,8 +6,17 @@ public class ToDoModel extends TaskId {
     private String task;
     private String due;
     private int status;
-
     private String reminder;
+
+    private int priority;
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
 
     public String getReminder() {
         return reminder;

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -60,6 +61,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
         bundle.putString("due" , toDoModel.getDue());
         bundle.putString("reminder",toDoModel.getReminder());
         bundle.putString("id" , toDoModel.TaskId);
+        bundle.putInt("priority",toDoModel.getPriority());
         addNewTask AddnewTask = new addNewTask();// Create a new instance of addNewTask dialog
         AddnewTask.setArguments(bundle);// Set the arguments for the dialog
         AddnewTask.show(activity.getSupportFragmentManager(), AddnewTask.getTag());// Show the dialog
@@ -98,6 +100,31 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
                 }
             }
         });
+
+        updatePriorityIcon(holder.mPriorityStar,toDoModel.getPriority());
+        holder.mPriorityStar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int newPriority = toDoModel.getPriority() == 1 ? 0 : 1;
+                firestore.collection("task").document(toDoModel.TaskId).update("priority", newPriority)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                toDoModel.setPriority(newPriority);
+                                updatePriorityIcon(holder.mPriorityStar, newPriority);
+                            }
+                        });
+            }
+        });
+
+    }
+
+    private void updatePriorityIcon(ImageView priorityStar, int priority){
+        if (priority == 1){
+            priorityStar.setImageResource(R.drawable.baseline_star_24);
+        }
+        else{
+            priorityStar.setImageResource(R.drawable.baseline_star_border_24);
+        }
     }
 
     private boolean toBoolean(int status) {
@@ -129,12 +156,15 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
         TextView mReminder;// TextView for reminder
         CheckBox mCheckBox;// CheckBox for task status
 
+        ImageView mPriorityStar; // Check priority or not
+
         public MyViewHolder(@NonNull View itemView) {
             // Constructor for initializing the views
             super(itemView);
             mDueDateTv = itemView.findViewById(R.id.dueDate);// Initialize due date TextView
             mCheckBox = itemView.findViewById(R.id.checkBox);// Initialize checkbox
             mReminder = itemView.findViewById(R.id.reminder);// Initialize reminder TextView
+            mPriorityStar = itemView.findViewById(R.id.priorityStar); // Initialize priority task
         }
     }
 }

@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -49,6 +50,7 @@ public class addNewTask extends BottomSheetDialogFragment {
     private TextView setReminder;
     private EditText desTask;
     private Button btnSave;
+    private ImageView prioriryStar;
     // Firebase instances
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
@@ -61,6 +63,7 @@ public class addNewTask extends BottomSheetDialogFragment {
     private String dueDateUpdate = "";
     private  String reminderTime = "";
     private  String reminderUpdate = "";
+    private int priority = 0;
 
     public static addNewTask newInstance() {
         return new addNewTask();
@@ -81,6 +84,7 @@ public class addNewTask extends BottomSheetDialogFragment {
         setReminder = view.findViewById(R.id.tv_reminder);
         desTask = view.findViewById(R.id.task_edittext);
         btnSave = view.findViewById(R.id.btnSave);
+        prioriryStar = view.findViewById(R.id.priorityStar);
         firestore = FirebaseFirestore.getInstance();// Initialize Firebase instances
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -96,13 +100,15 @@ public class addNewTask extends BottomSheetDialogFragment {
             id = bundle.getString("id");
             dueDateUpdate = bundle.getString("due");
             reminderUpdate = bundle.getString("reminder");
+            priority = bundle.getInt("priority", 0);
             desTask.setText(task);
             setDueDate.setText(dueDateUpdate);
             setReminder.setText(reminderUpdate);
-            if(task.length()>0){
-                btnSave.setEnabled(false);
-                btnSave.setBackgroundColor(Color.GRAY);
-            }
+            updatePriorityIcon();
+//            if(task.length()>0){
+//                btnSave.setEnabled(false);
+//                btnSave.setBackgroundColor(Color.GRAY);
+//            }
         }
 
         desTask.addTextChangedListener(new TextWatcher() {// Add text change listener to task description
@@ -166,6 +172,14 @@ public class addNewTask extends BottomSheetDialogFragment {
             }
         });
 
+        prioriryStar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                priority = priority == 1 ? 0 : 1;
+                updatePriorityIcon();
+            }
+        });
+
         btnSave.setOnClickListener(new View.OnClickListener() {// Save button click listener
             @Override
             public void onClick(View view) {
@@ -176,6 +190,7 @@ public class addNewTask extends BottomSheetDialogFragment {
                     updatedTaskMap.put("task", taskDescription);
                     updatedTaskMap.put("due", dueDate);
                     updatedTaskMap.put("reminder", reminderTime);
+                    updatedTaskMap.put("priority",priority);
 
                     if (userID != null) {
                         firestore.collection("users").document(userID).collection("task").document(id).update(updatedTaskMap)
@@ -208,6 +223,7 @@ public class addNewTask extends BottomSheetDialogFragment {
                     taskMap.put("due", dueDate);
                     taskMap.put("status", 0);
                     taskMap.put("reminder", reminderTime);
+                    taskMap.put("priority",priority);
                     taskMap.put("time", FieldValue.serverTimestamp());
                     if (userID != null) {
                         firestore.collection("users").document(userID).collection("task").add(taskMap).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
@@ -233,6 +249,14 @@ public class addNewTask extends BottomSheetDialogFragment {
                 dismiss();// Close the dialog
             }
         });
+    }
+    private  void updatePriorityIcon(){
+        if (priority == 1){
+            prioriryStar.setImageResource(R.drawable.baseline_star_24);
+        }
+        else {
+            prioriryStar.setImageResource(R.drawable.baseline_star_border_24);
+        }
     }
     private void scheduleReminder(String taskId, Map<String, Object> taskMap) {// Method to schedule a reminder using AlarmManager
         // Ensure context is not null

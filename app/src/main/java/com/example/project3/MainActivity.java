@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity  implements OnDialogCloseLis
             return;
         }
         // Query the Firestore database for the user's tasks, ordered by time in descending order
-        query = firestore.collection("users").document(userID).collection("task").orderBy("time", Query.Direction.DESCENDING);
+        query = firestore.collection("users").document(userID).collection("task").orderBy("priority", Query.Direction.DESCENDING).orderBy("due", Query.Direction.ASCENDING).orderBy("reminder", Query.Direction.ASCENDING).orderBy("time", Query.Direction.DESCENDING);
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
