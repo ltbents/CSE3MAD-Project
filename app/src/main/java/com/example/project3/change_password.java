@@ -109,7 +109,9 @@ public class change_password extends BottomSheetDialogFragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    int cursorPosition = passwordField.getSelectionStart();
                     passwordField.setTransformationMethod(null);
+                    passwordField.setSelection(cursorPosition);
                 } else {
                     int cursorPosition = passwordField.getSelectionStart();
                     passwordField.setTransformationMethod(new android.text.method.PasswordTransformationMethod());

@@ -6,9 +6,10 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,9 +17,6 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,128 +26,140 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.Objects;
-
 public class Login extends AppCompatActivity {
-    // UI elements
     TextInputEditText editTextEmail, editTextPassword;
     Button btnLog;
-    // Firebase Authentication instance
     FirebaseAuth mAuth;
     ProgressBar progressBar;
     TextView textView;
     FloatingActionButton btnBack;
     Handler handler = new Handler();
     Runnable hidePasswordRunnable;
+    CheckBox showPasswordCheckbox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this); // Enable edge-to-edge experience
-        setContentView(R.layout.activity_login);// Set the content view to the login activity layout
-        mAuth = FirebaseAuth.getInstance();// Initialize Firebase Auth instance
-        // Initialize UI elements
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_login);
+        mAuth = FirebaseAuth.getInstance();
         btnBack = findViewById(R.id.btnBack);
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
         btnLog = findViewById(R.id.btnLogLogin);
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.registerNow);
+        showPasswordCheckbox = findViewById(R.id.showCurrentPassword);
 
-        btnBack.setOnClickListener(new View.OnClickListener() {// Set the back button click listener
+        btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Navigate to welcome page
                 Intent intent = new Intent(getApplicationContext(), welcomePage.class);
                 startActivity(intent);
                 finish();
             }
         });
-        textView.setOnClickListener(new View.OnClickListener() {// Set the register text view click listener
+
+        textView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {// Navigate to register page
-                Intent intent =  new Intent(getApplicationContext(), Register.class);
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), Register.class);
                 startActivity(intent);
                 finish();
             }
         });
 
-        btnLog.setOnClickListener(new View.OnClickListener() {// Set the login button click listener
+        btnLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                progressBar.setVisibility(View.VISIBLE);// Show progress bar
-                // Get the email and password from the input fields
+                progressBar.setVisibility(View.VISIBLE);
                 String email, password;
                 email = String.valueOf(editTextEmail.getText());
                 password = String.valueOf(editTextPassword.getText());
 
-                if (TextUtils.isEmpty(email) && TextUtils.isEmpty(password)){
-                    // Validate the input fields
-                    Toast.makeText(Login.this,"Enter email and password",Toast.LENGTH_SHORT).show();
+                if (TextUtils.isEmpty(email) && TextUtils.isEmpty(password)) {
+                    Toast.makeText(Login.this, "Enter email and password", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
-                }
-                else if (TextUtils.isEmpty(email)){
-                    Toast.makeText(Login.this,"Enter email",Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(email)) {
+                    Toast.makeText(Login.this, "Enter email", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
-                }
-                else if (TextUtils.isEmpty(password)){
-                    Toast.makeText(Login.this,"Enter password",Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(password)) {
+                    Toast.makeText(Login.this, "Enter password", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
-                }
-                else {
-                    mAuth.signInWithEmailAndPassword(email, password)// Sign in with email and password
+                } else {
+                    mAuth.signInWithEmailAndPassword(email, password)
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
-                                    progressBar.setVisibility(View.GONE); // Hide progress bar
+                                    progressBar.setVisibility(View.GONE);
                                     if (task.isSuccessful()) {
-                                        FirebaseUser user = mAuth.getCurrentUser(); // Sign in success, update UI with the signed-in user's information
+                                        FirebaseUser user = mAuth.getCurrentUser();
                                         Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);// Navigate to main activity
+                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                         startActivity(intent);
                                         finish();
-                                    } else { // If sign in fails, display a message to the user
+                                    } else {
                                         Toast.makeText(Login.this, "Authentication failed.",
                                                 Toast.LENGTH_SHORT).show();
                                     }
                                 }
-
                             });
                 }
             }
         });
+
         editTextPassword.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No action needed before text change
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Cancel any previous hide action
                 handler.removeCallbacks(hidePasswordRunnable);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+                // Schedule to hide the password after 1 second
                 hidePasswordRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        int cursorPosition = editTextPassword.getSelectionStart(); // Save cursor position
-                        editTextPassword.setTransformationMethod(new android.text.method.PasswordTransformationMethod());
-                        editTextPassword.setSelection(cursorPosition); // Restore cursor position
+                        if (!showPasswordCheckbox.isChecked()) {
+                            int cursorPosition = editTextPassword.getSelectionStart(); // Save cursor position
+                            editTextPassword.setTransformationMethod(new android.text.method.PasswordTransformationMethod());
+                            editTextPassword.setSelection(cursorPosition); // Restore cursor position
+                        }
                     }
                 };
                 handler.postDelayed(hidePasswordRunnable, 1000); // 1 second delay
             }
         });
 
-
-
+        showPasswordCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    int cursorPosition = editTextPassword.getSelectionStart();
+                    editTextPassword.setTransformationMethod(null); // Show password
+                    editTextPassword.setSelection(cursorPosition);
+                } else {
+                    int cursorPosition = editTextPassword.getSelectionStart(); // Save cursor position
+                    editTextPassword.setTransformationMethod(new android.text.method.PasswordTransformationMethod()); // Hide password
+                    editTextPassword.setSelection(cursorPosition); // Restore cursor position
+                }
+            }
+        });
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // Remove any pending hide password actions when the activity is destroyed
         handler.removeCallbacks(hidePasswordRunnable);
     }
 }
